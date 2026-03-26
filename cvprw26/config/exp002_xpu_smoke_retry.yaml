@@ -30,11 +30,12 @@ train:
   print_freq: 10
   num_workers: 0
   device: xpu
+  eval_device: cpu
   pin_memory: false
   train_subset_size: 16
   val_subset_size: 4
   auto_resume: false
-  output_dir: outputs/exp002_smoke_retry/
+  output_dir: outputs/exp002_smoke_evalcpu/
 
 test:
   ann_file: data/instance_annotations/val.json

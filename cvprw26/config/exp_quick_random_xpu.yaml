@@ -16,25 +16,26 @@ model:
   rpn_post_nms_top_n_test: 1500
 
 train:
-  epochs: 1
+  epochs: 2
   batch_size: 1
   lr: 0.002
   momentum: 0.9
   weight_decay: 0.0001
-  lr_steps: [8, 11]
+  lr_steps: [2]
   lr_gamma: 0.1
-  warmup_iters: 10
+  warmup_iters: 6
   warmup_factor: 0.001
   amp: false
   seed: 42
-  print_freq: 1
+  print_freq: 4
   num_workers: 0
-  output_dir: outputs/smoke_xpu/
+  output_dir: outputs/exp_quick_random_run1/
   device: xpu
   eval_device: cpu
   pin_memory: false
-  train_subset_size: 8
-  val_subset_size: 4
+  train_subset_size: 16
+  val_subset_size: 8
+  sampler: random
 
 test:
   ann_file: data/instance_annotations/val.json

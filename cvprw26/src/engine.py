@@ -214,6 +214,14 @@ def train_one_epoch(
         )
 
     for i, (images, targets) in enumerate(metric_logger.log_every(data_loader, print_freq, header)):
+        batch_image_ids = []
+        for target in targets:
+            image_id = target.get("image_id")
+            if isinstance(image_id, torch.Tensor):
+                batch_image_ids.append(int(image_id.item()))
+            elif image_id is not None:
+                batch_image_ids.append(int(image_id))
+
         images = [img.to(device) for img in images]
         if device.type == 'xpu':
             torch.xpu.synchronize()
@@ -233,6 +241,7 @@ def train_one_epoch(
 
         if not np.isfinite(loss_value):
             print(f"Loss is {loss_value}, stopping training")
+            print(f"Batch image_ids: {batch_image_ids}")
             print(loss_dict)
             raise SystemExit(1)
 

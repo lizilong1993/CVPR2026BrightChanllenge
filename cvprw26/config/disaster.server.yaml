@@ -16,35 +16,34 @@ model:
   rpn_post_nms_top_n_test: 1500
 
 train:
-  epochs: 1
+  epochs: 12
   batch_size: 1
   lr: 0.002
   momentum: 0.9
   weight_decay: 0.0001
   lr_steps: [8, 11]
   lr_gamma: 0.1
-  warmup_iters: 10
+  warmup_iters: 500
   warmup_factor: 0.001
-  amp: false
+  amp: true
   seed: 42
-  print_freq: 1
-  num_workers: 0
-  output_dir: outputs/smoke_xpu/
-  device: xpu
-  eval_device: cpu
-  pin_memory: false
-  train_subset_size: 8
-  val_subset_size: 4
+  print_freq: 50
+  num_workers: 4
+  device: cuda
+  eval_device: cuda
+  pin_memory: true
+  auto_resume: true
+  output_dir: outputs/server_run1/
 
 test:
   ann_file: data/instance_annotations/val.json
-  checkpoint: outputs/best_model.pth
-  output_json: outputs/test/predictions.json
+  checkpoint: outputs/server_run1/best_model.pth
+  output_json: outputs/server_run1/test/predictions.json
 
 infer:
-  checkpoint: outputs/best_model.pth
+  checkpoint: outputs/server_run1/best_model.pth
   ann_file: data/instance_annotations/holdout.json
-  output_json: outputs/infer/predictions.json
+  output_json: outputs/server_run1/infer/predictions.json
   num_workers: 4
   visualize: false
   vis_score_thr: null
@@ -52,5 +51,5 @@ infer:
 
 eval:
   ann_file: data/instance_annotations_old_20260323/holdout.json
-  prediction_json: outputs/eval/predictions.json
-  metrics_json: outputs/eval/predictions_metrics.json
+  prediction_json: outputs/server_run1/eval/predictions.json
+  metrics_json: outputs/server_run1/eval/predictions_metrics.json

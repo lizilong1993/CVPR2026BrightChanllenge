@@ -12,7 +12,7 @@ import logging
 import os
 
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 
 from src.utils import load_config, set_seed, collate_fn
 from src.dataset.data import BRIGHTDataset, get_transforms
@@ -28,8 +28,8 @@ def get_loss_criterion(model_cfg):
     return None  # Use default
 
 
-def resolve_device(train_cfg, logger):
-    requested = str(train_cfg.get("device", "auto")).lower()
+def resolve_runtime_device(requested, logger, label):
+    requested = str(requested).lower()
     if requested == "auto":
         candidates = ("xpu", "cuda", "cpu")
     else:
@@ -38,19 +38,31 @@ def resolve_device(train_cfg, logger):
     for candidate in candidates:
         if candidate == "xpu" and hasattr(torch, "xpu") and torch.xpu.is_available():
             device = torch.device("xpu")
-            logger.info("Using device: xpu")
+            logger.info(f"Using {label}: xpu")
             return device
         if candidate == "cuda" and torch.cuda.is_available():
             device = torch.device("cuda")
-            logger.info("Using device: cuda")
+            logger.info(f"Using {label}: cuda")
             return device
         if candidate == "cpu":
             device = torch.device("cpu")
-            logger.info("Using device: cpu")
+            logger.info(f"Using {label}: cpu")
             return device
 
-    logger.warning(f"Requested device '{requested}' is unavailable. Falling back to CPU.")
+    logger.warning(f"Requested {label} '{requested}' is unavailable. Falling back to CPU.")
     return torch.device("cpu")
+
+
+def resolve_device(train_cfg, logger):
+    return resolve_runtime_device(train_cfg.get("device", "auto"), logger, "train device")
+
+
+def resolve_eval_device(train_cfg, train_device, logger):
+    requested = train_cfg.get("eval_device")
+    if requested in (None, "", "same"):
+        logger.info(f"Using eval device: {train_device.type}")
+        return train_device
+    return resolve_runtime_device(requested, logger, "eval device")
 
 
 def maybe_subset(dataset, subset_size, seed, split_name, logger):
@@ -63,6 +75,85 @@ def maybe_subset(dataset, subset_size, seed, split_name, logger):
     indices = torch.randperm(len(dataset), generator=generator).tolist()[:subset_size]
     logger.info(f"{split_name} split subset enabled: {subset_size}/{len(dataset)} samples")
     return torch.utils.data.Subset(dataset, indices)
+
+
+def maybe_filter_empty_targets(dataset, enabled, logger):
+    if not enabled:
+        return dataset
+
+    if not hasattr(dataset, "coco") or not hasattr(dataset, "ids"):
+        logger.warning("Empty-target filtering skipped because dataset does not expose COCO ids.")
+        return dataset
+
+    kept_indices = []
+    for idx, image_id in enumerate(dataset.ids):
+        if dataset.coco.getAnnIds(imgIds=image_id):
+            kept_indices.append(idx)
+
+    logger.info(f"Filtered empty-target training samples: kept {len(kept_indices)}/{len(dataset)}")
+    return torch.utils.data.Subset(dataset, kept_indices)
+
+
+def unwrap_dataset(dataset):
+    if isinstance(dataset, torch.utils.data.Subset):
+        return dataset.dataset, list(dataset.indices)
+    return dataset, None
+
+
+def build_train_sampler(dataset, train_cfg, logger):
+    strategy = str(train_cfg.get("sampler", "random")).lower()
+    if strategy in ("", "none", "random"):
+        return None
+
+    if strategy != "damage_aware":
+        raise ValueError(f"Unsupported train.sampler={strategy!r}. Use random/none/damage_aware.")
+
+    base_dataset, subset_indices = unwrap_dataset(dataset)
+    if not hasattr(base_dataset, "coco") or not hasattr(base_dataset, "ids"):
+        logger.warning("Damage-aware sampler is unavailable for the current dataset type. Falling back to random sampling.")
+        return None
+
+    if subset_indices is None:
+        subset_indices = list(range(len(base_dataset)))
+
+    damaged_boost = float(train_cfg.get("damaged_boost", 8.0))
+    destroyed_boost = float(train_cfg.get("destroyed_boost", 4.0))
+
+    weights = []
+    damaged_images = 0
+    destroyed_images = 0
+    boosted_images = 0
+
+    for dataset_idx in subset_indices:
+        image_id = base_dataset.ids[dataset_idx]
+        anns = base_dataset.coco.imgToAnns.get(image_id, [])
+        categories = {ann["category_id"] for ann in anns}
+
+        weight = 1.0
+        if 2 in categories:
+            weight *= damaged_boost
+            damaged_images += 1
+        if 3 in categories:
+            weight *= destroyed_boost
+            destroyed_images += 1
+        if weight > 1.0:
+            boosted_images += 1
+        weights.append(weight)
+
+    logger.info(
+        "Using damage-aware sampler: boosted=%d/%d, damaged_images=%d, destroyed_images=%d, damaged_boost=%.2f, destroyed_boost=%.2f",
+        boosted_images,
+        len(weights),
+        damaged_images,
+        destroyed_images,
+        damaged_boost,
+        destroyed_boost,
+    )
+    return WeightedRandomSampler(
+        torch.as_tensor(weights, dtype=torch.double),
+        num_samples=len(weights),
+        replacement=True,
+    )
 
 
 def main():
@@ -93,6 +184,7 @@ def main():
     set_seed(train_cfg["seed"])
 
     device = resolve_device(train_cfg, logger)
+    eval_device = resolve_eval_device(train_cfg, device, logger)
     pin_memory = bool(train_cfg.get("pin_memory", device.type in {"cuda", "xpu"}))
 
     # Datasets & data loaders
@@ -104,6 +196,11 @@ def main():
         image_dir=image_dir,
         pre_event_dir=pre_event_dir,
         transforms=get_transforms(train=True),
+    )
+    train_dataset = maybe_filter_empty_targets(
+        train_dataset,
+        train_cfg.get("filter_empty_targets", False),
+        logger,
     )
     train_dataset = maybe_subset(
         train_dataset,
@@ -132,11 +229,13 @@ def main():
         len(train_dataset),
         len(val_dataset),
     )
+    train_sampler = build_train_sampler(train_dataset, train_cfg, logger)
 
     train_loader = DataLoader(
         train_dataset,
         batch_size=train_cfg["batch_size"],
-        shuffle=True,
+        shuffle=train_sampler is None,
+        sampler=train_sampler,
         num_workers=train_cfg["num_workers"],
         collate_fn=collate_fn,
         pin_memory=pin_memory,
@@ -269,7 +368,15 @@ def main():
         lr_scheduler.step()
 
         eval_dir = os.path.join(output_dir, "eval")
-        metrics = evaluate(model, val_loader, device, output_dir=eval_dir, epoch=epoch, log_file=log_file)
+        if eval_device != device:
+            logger.info(f"Moving model to {eval_device.type} for evaluation")
+            model.to(eval_device)
+        try:
+            metrics = evaluate(model, val_loader, eval_device, output_dir=eval_dir, epoch=epoch, log_file=log_file)
+        finally:
+            if eval_device != device:
+                logger.info(f"Moving model back to {device.type} after evaluation")
+                model.to(device)
         logger.info(f"Epoch [{epoch}] evaluation: {metrics}")
         for line in format_metrics_report(metrics):
             logger.info(f"Epoch [{epoch}] {line}")
