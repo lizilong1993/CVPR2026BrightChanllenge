@@ -22,6 +22,17 @@ if [ ! -f "$REPO_DIR/$CONFIG_PATH" ]; then
   exit 1
 fi
 
+OUTPUT_DIR="$(python - <<PY
+from pathlib import Path
+import yaml
+
+config_path = Path(r"$REPO_DIR") / r"$CONFIG_PATH"
+with open(config_path, "r", encoding="utf-8") as f:
+    cfg = yaml.safe_load(f)
+print(cfg["train"]["output_dir"])
+PY
+)"
+
 if [ -d "$REPO_DIR/BRIGHT_DATA" ]; then
   for required_dir in post-event pre-event; do
     if [ ! -d "$REPO_DIR/BRIGHT_DATA/$required_dir" ]; then
@@ -46,4 +57,4 @@ tmux new-session -d -s "$SESSION_NAME" \
 echo "Training started in tmux session: $SESSION_NAME"
 echo "Attach : tmux attach -t $SESSION_NAME"
 echo "Detach : Ctrl+b then d"
-echo "Logs   : tail -f $REPO_DIR/outputs/server_run1/train.log"
+echo "Logs   : tail -f $REPO_DIR/$OUTPUT_DIR/train.log"
