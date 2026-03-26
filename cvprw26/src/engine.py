@@ -30,6 +30,13 @@ EVAL_IOU_TYPES = ("bbox", "segm")
 EVAL_MAX_DETS = (1, 100, 1500)
 
 
+def _unwrap_dataset(dataset):
+    """Return the underlying dataset, unwrapping torch.utils.data.Subset layers."""
+    while hasattr(dataset, "dataset"):
+        dataset = dataset.dataset
+    return dataset
+
+
 def _sanitize_category_name(name: str) -> str:
     """Convert a category label into a metric-friendly suffix."""
     return "".join(ch.lower() if ch.isalnum() else "_" for ch in name).strip("_")
@@ -281,7 +288,8 @@ def evaluate(model, data_loader, device, output_dir=None, epoch=None, log_file=N
         _logger.addHandler(logging.FileHandler(log_file, mode="a"))
 
     model.eval()
-    coco_gt = data_loader.dataset.coco  # pycocotools COCO object
+    base_dataset = _unwrap_dataset(data_loader.dataset)
+    coco_gt = base_dataset.coco  # pycocotools COCO object
 
     coco_results = []
     num_images = len(data_loader)

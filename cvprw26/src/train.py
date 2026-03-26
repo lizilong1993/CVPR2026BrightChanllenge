@@ -28,6 +28,43 @@ def get_loss_criterion(model_cfg):
     return None  # Use default
 
 
+def resolve_device(train_cfg, logger):
+    requested = str(train_cfg.get("device", "auto")).lower()
+    if requested == "auto":
+        candidates = ("xpu", "cuda", "cpu")
+    else:
+        candidates = (requested,)
+
+    for candidate in candidates:
+        if candidate == "xpu" and hasattr(torch, "xpu") and torch.xpu.is_available():
+            device = torch.device("xpu")
+            logger.info("Using device: xpu")
+            return device
+        if candidate == "cuda" and torch.cuda.is_available():
+            device = torch.device("cuda")
+            logger.info("Using device: cuda")
+            return device
+        if candidate == "cpu":
+            device = torch.device("cpu")
+            logger.info("Using device: cpu")
+            return device
+
+    logger.warning(f"Requested device '{requested}' is unavailable. Falling back to CPU.")
+    return torch.device("cpu")
+
+
+def maybe_subset(dataset, subset_size, seed, split_name, logger):
+    if subset_size in (None, 0, "", False):
+        logger.info(f"{split_name} split uses full dataset: {len(dataset)} samples")
+        return dataset
+
+    subset_size = min(int(subset_size), len(dataset))
+    generator = torch.Generator().manual_seed(int(seed))
+    indices = torch.randperm(len(dataset), generator=generator).tolist()[:subset_size]
+    logger.info(f"{split_name} split subset enabled: {subset_size}/{len(dataset)} samples")
+    return torch.utils.data.Subset(dataset, indices)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Train Mask R-CNN on BRIGHT data")
     parser.add_argument("--config", default="config/disaster.yaml", help="Path to YAML config file")
@@ -55,9 +92,8 @@ def main():
 
     set_seed(train_cfg["seed"])
 
-    # Force CPU for stability if XPU is failing
-    device = torch.device("cpu")
-    logger.info(f"Using device: {device} (Forced for stability)")
+    device = resolve_device(train_cfg, logger)
+    pin_memory = bool(train_cfg.get("pin_memory", device.type in {"cuda", "xpu"}))
 
     # Datasets & data loaders
     image_dir = os.path.join(data_cfg["root"], data_cfg["images_dir"])
@@ -69,9 +105,13 @@ def main():
         pre_event_dir=pre_event_dir,
         transforms=get_transforms(train=True),
     )
-    # Subset for speed on CPU if needed (optional, uncomment to use)
-    indices = torch.randperm(len(train_dataset)).tolist()
-    train_dataset = torch.utils.data.Subset(train_dataset, indices[:200])
+    train_dataset = maybe_subset(
+        train_dataset,
+        train_cfg.get("train_subset_size"),
+        train_cfg["seed"],
+        "train",
+        logger,
+    )
 
     val_dataset = BRIGHTDataset(
         ann_file=data_cfg["val_ann"],
@@ -79,8 +119,19 @@ def main():
         pre_event_dir=pre_event_dir,
         transforms=get_transforms(train=False),
     )
-    val_indices = torch.randperm(len(val_dataset)).tolist()
-    val_dataset = torch.utils.data.Subset(val_dataset, val_indices[:50])
+    val_dataset = maybe_subset(
+        val_dataset,
+        train_cfg.get("val_subset_size"),
+        train_cfg["seed"] + 1,
+        "val",
+        logger,
+    )
+
+    logger.info(
+        "Dataset summary: train=%d samples, val=%d samples",
+        len(train_dataset),
+        len(val_dataset),
+    )
 
     train_loader = DataLoader(
         train_dataset,
@@ -88,7 +139,7 @@ def main():
         shuffle=True,
         num_workers=train_cfg["num_workers"],
         collate_fn=collate_fn,
-        pin_memory=True,
+        pin_memory=pin_memory,
     )
 
     val_loader = DataLoader(
@@ -97,7 +148,7 @@ def main():
         shuffle=False,
         num_workers=train_cfg["num_workers"],
         collate_fn=collate_fn,
-        pin_memory=True,
+        pin_memory=pin_memory,
     )
 
     # Model
@@ -183,9 +234,15 @@ def main():
     start_epoch = 0
     best_ap = 0.0
 
-    if args.resume:
-        logger.info(f"Resuming from checkpoint: {args.resume}")
-        checkpoint = torch.load(args.resume, map_location=device)
+    resume_path = args.resume
+    if not resume_path and train_cfg.get("auto_resume", False):
+        candidate = os.path.join(output_dir, "latest.pth")
+        if os.path.exists(candidate):
+            resume_path = candidate
+
+    if resume_path:
+        logger.info(f"Resuming from checkpoint: {resume_path}")
+        checkpoint = torch.load(resume_path, map_location=device)
         model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])

@@ -1,7 +1,6 @@
 import subprocess
 import yaml
 import os
-import copy
 
 def run_train(config_path, output_dir, seed):
     # Load config
@@ -11,18 +10,29 @@ def run_train(config_path, output_dir, seed):
     # Update config for the specific run
     cfg['train']['seed'] = seed
     cfg['train']['output_dir'] = output_dir
-    
+
+    os.makedirs(output_dir, exist_ok=True)
+    best_model = os.path.join(output_dir, "best_model.pth")
+    latest_ckpt = os.path.join(output_dir, "latest.pth")
+    if os.path.exists(best_model):
+        print(f"Skipping completed run for seed {seed}: {best_model}")
+        return
+
     # Save temporary config
-    temp_config = f"config_temp_{seed}.yaml"
+    temp_config = os.path.join(output_dir, f"config_seed{seed}.yaml")
     with open(temp_config, 'w') as f:
         yaml.dump(cfg, f)
     
     print(f"Starting training with seed {seed}, output to {output_dir}")
     cmd = ["python", "-m", "src.train", "--config", temp_config]
+    if os.path.exists(latest_ckpt):
+        print(f"Resuming existing run for seed {seed}: {latest_ckpt}")
+        cmd.extend(["--resume", latest_ckpt])
     subprocess.run(cmd, check=True)
     
     # Cleanup
-    os.remove(temp_config)
+    if os.path.exists(temp_config):
+        os.remove(temp_config)
 
 import sys
 
