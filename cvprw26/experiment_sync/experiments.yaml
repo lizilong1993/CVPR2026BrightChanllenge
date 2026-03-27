@@ -1,0 +1,22 @@
+{
+  "experiments": {
+    "exp001_run1": {
+      "best_epoch": 0,
+      "best_metric_name": "segm_AP",
+      "best_metric_value": 0.09426429261597485,
+      "experiment_id": "exp001_run1",
+      "last_seen_at": "2026-03-27T03:37:17Z",
+      "last_sync_event_id": "exp001_run1:best:epoch000:0.094264",
+      "latest_epoch": 0,
+      "remote": {
+        "host": "lizilong@146.56.220.99",
+        "output_dir": "/remote-home/lizilong/bright_cvprw26/outputs/exp001_run1",
+        "port": 21427,
+        "project_dir": "/remote-home/lizilong/bright_cvprw26"
+      },
+      "status": "running",
+      "sync_dir": "experiment_sync\\runs\\exp001_run1"
+    }
+  },
+  "generated_at": "2026-03-27T03:37:17Z"
+}
