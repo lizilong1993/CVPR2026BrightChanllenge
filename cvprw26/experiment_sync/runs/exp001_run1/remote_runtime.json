@@ -1,0 +1,27 @@
+{
+  "best_ckpt": {
+    "exists": true,
+    "mtime": 1774584238.6142035,
+    "size": 351202127
+  },
+  "gpu_processes": [
+    "3915170, [Not Found], 25395 MiB"
+  ],
+  "latest_ckpt": {
+    "exists": true,
+    "mtime": 1774584237.8231807,
+    "size": 351194279
+  },
+  "observed_at": 1774585695.9812894,
+  "process_matches": [
+    "14217 bash -c cd /remote-home/lizilong/bright_cvprw26 && mkdir -p outputs/exp001_run1 && nohup bash -lc 'cd /remote-home/lizilong/bright_cvprw26 && PYTHONPATH=. CUDA_VISIBLE_DEVICES=0 python3 -m src.train --config config/disaster.yaml' > outputs/exp001_run1/train_console.log 2>&1 < /dev/null & echo $!",
+    "14219 python3 -m src.train --config config/disaster.yaml"
+  ],
+  "process_pattern": "python3 -m src.train --config config/disaster.yaml",
+  "process_running": true,
+  "train_log": {
+    "exists": true,
+    "mtime": 1774585647.6477687,
+    "size": 43984
+  }
+}

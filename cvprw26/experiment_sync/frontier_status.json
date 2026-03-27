@@ -1,0 +1,10 @@
+{
+  "active_candidate_id": null,
+  "active_experiment_id": null,
+  "candidate": {},
+  "next_direction": "Keep monitoring optimization rounds.",
+  "reason": "Frontier loop has not been activated.",
+  "state": "inactive",
+  "triggered_by_rounds": [],
+  "updated_at": "2026-03-27T00:00:00Z"
+}

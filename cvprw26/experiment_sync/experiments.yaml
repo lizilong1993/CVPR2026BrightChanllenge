@@ -1,13 +1,41 @@
 {
+  "consecutive_stalled_rounds": 0,
+  "current_reference_experiment_id": "exp001_run1",
+  "current_reference_metric": 0.11757984572244333,
   "experiments": {
     "exp001_run1": {
-      "best_epoch": 0,
+      "best_epoch": 1,
       "best_metric_name": "segm_AP",
-      "best_metric_value": 0.09426429261597485,
+      "best_metric_value": 0.11757984572244333,
+      "best_metrics": {
+        "epoch": 1,
+        "segm_AP": 0.11757984572244333,
+        "segm_AP50": 0.2253909794014092,
+        "segm_AP75": 0.11622987016551274,
+        "segm_AP_damaged": 0.004741439704960959,
+        "segm_AP_destroyed": 0.08809868624179369,
+        "segm_AP_intact": 0.25989941122057536
+      },
       "experiment_id": "exp001_run1",
-      "last_seen_at": "2026-03-27T03:37:17Z",
-      "last_sync_event_id": "exp001_run1:best:epoch000:0.094264",
-      "latest_epoch": 0,
+      "last_seen_at": "2026-03-27T04:28:22Z",
+      "last_sync_event_id": "exp001_run1:best:epoch001:0.117580",
+      "latest_epoch": 1,
+      "latest_metrics": {
+        "epoch": 1,
+        "segm_AP": 0.11757984572244333,
+        "segm_AP50": 0.2253909794014092,
+        "segm_AP75": 0.11622987016551274,
+        "train_loss": 1.0842
+      },
+      "log_age_seconds": 48,
+      "optimization": {
+        "damaged_delta": 0.0,
+        "delta_to_reference": 0.0,
+        "destroyed_delta": 0.0,
+        "reason": "Current best segm_AP across tracked experiments.",
+        "reference_experiment_id": "exp001_run1",
+        "result": "reference"
+      },
       "remote": {
         "host": "lizilong@146.56.220.99",
         "output_dir": "/remote-home/lizilong/bright_cvprw26/outputs/exp001_run1",
@@ -18,5 +46,7 @@
       "sync_dir": "experiment_sync\\runs\\exp001_run1"
     }
   },
-  "generated_at": "2026-03-27T03:37:17Z"
+  "generated_at": "2026-03-27T04:28:22Z",
+  "latest_stalled_round_ids": [],
+  "rounds": {}
 }
