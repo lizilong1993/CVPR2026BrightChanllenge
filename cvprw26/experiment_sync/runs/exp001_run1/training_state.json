@@ -1,13 +1,13 @@
 {
   "best_checkpoint": "/remote-home/lizilong/bright_cvprw26/outputs/exp001_run1/best_model.pth",
-  "best_epoch": 1,
+  "best_epoch": 11,
   "best_metric_name": "segm_AP",
-  "best_metric_value": 0.11757984572244333,
+  "best_metric_value": 0.1694341960941629,
   "config_path": null,
   "experiment_id": "exp001_run1",
   "latest_checkpoint": "/remote-home/lizilong/bright_cvprw26/outputs/exp001_run1/latest.pth",
-  "latest_epoch": 1,
-  "started_at": "2026-03-27T04:28:11Z",
-  "status": "running",
-  "updated_at": "2026-03-27T04:28:11Z"
+  "latest_epoch": 11,
+  "started_at": "2026-03-29T00:19:54Z",
+  "status": "completed",
+  "updated_at": "2026-03-29T00:19:54Z"
 }

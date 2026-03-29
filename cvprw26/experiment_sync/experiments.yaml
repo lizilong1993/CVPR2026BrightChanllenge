@@ -1,33 +1,33 @@
 {
   "consecutive_stalled_rounds": 0,
   "current_reference_experiment_id": "exp001_run1",
-  "current_reference_metric": 0.11757984572244333,
+  "current_reference_metric": 0.1694341960941629,
   "experiments": {
     "exp001_run1": {
-      "best_epoch": 1,
+      "best_epoch": 11,
       "best_metric_name": "segm_AP",
-      "best_metric_value": 0.11757984572244333,
+      "best_metric_value": 0.1694341960941629,
       "best_metrics": {
-        "epoch": 1,
-        "segm_AP": 0.11757984572244333,
-        "segm_AP50": 0.2253909794014092,
-        "segm_AP75": 0.11622987016551274,
-        "segm_AP_damaged": 0.004741439704960959,
-        "segm_AP_destroyed": 0.08809868624179369,
-        "segm_AP_intact": 0.25989941122057536
+        "epoch": 11,
+        "segm_AP": 0.1694341960941629,
+        "segm_AP50": 0.31393705409732514,
+        "segm_AP75": 0.17180406439675777,
+        "segm_AP_damaged": 0.05408487994655107,
+        "segm_AP_destroyed": 0.13637066648293314,
+        "segm_AP_intact": 0.31784704185300466
       },
       "experiment_id": "exp001_run1",
-      "last_seen_at": "2026-03-27T04:28:22Z",
-      "last_sync_event_id": "exp001_run1:best:epoch001:0.117580",
-      "latest_epoch": 1,
+      "last_seen_at": "2026-03-29T00:19:54Z",
+      "last_sync_event_id": "exp001_run1:best:epoch011:0.169434",
+      "latest_epoch": 11,
       "latest_metrics": {
-        "epoch": 1,
-        "segm_AP": 0.11757984572244333,
-        "segm_AP50": 0.2253909794014092,
-        "segm_AP75": 0.11622987016551274,
-        "train_loss": 1.0842
+        "epoch": 11,
+        "segm_AP": 0.1694341960941629,
+        "segm_AP50": 0.31393705409732514,
+        "segm_AP75": 0.17180406439675777,
+        "train_loss": 0.8327
       },
-      "log_age_seconds": 48,
+      "log_age_seconds": 140448,
       "optimization": {
         "damaged_delta": 0.0,
         "delta_to_reference": 0.0,
@@ -42,11 +42,11 @@
         "port": 21427,
         "project_dir": "/remote-home/lizilong/bright_cvprw26"
       },
-      "status": "running",
+      "status": "completed",
       "sync_dir": "experiment_sync\\runs\\exp001_run1"
     }
   },
-  "generated_at": "2026-03-27T04:28:22Z",
+  "generated_at": "2026-03-29T00:19:54Z",
   "latest_stalled_round_ids": [],
   "rounds": {}
 }

@@ -19,7 +19,7 @@
   "segm_AP_damaged": 0.004741439704960959,
   "segm_AP_destroyed": 0.08809868624179369,
   "segm_AP_intact": 0.25989941122057536,
-  "status": "running",
-  "timestamp": "2026-03-27T04:28:11Z",
+  "status": "completed",
+  "timestamp": "2026-03-29T00:19:54Z",
   "train_loss": 1.0842
 }

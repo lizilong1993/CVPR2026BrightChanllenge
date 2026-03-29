@@ -1,12 +1,12 @@
 # exp001_run1
 
-- Status: **RUNNING**
-- Updated: `2026-03-27T04:28:11Z`
-- Best segm_AP: `0.1176` at epoch `1`
-- Latest epoch: `1`
+- Status: **COMPLETED**
+- Updated: `2026-03-29T00:19:54Z`
+- Best segm_AP: `0.1694` at epoch `11`
+- Latest epoch: `11`
 
 ## Latest Metrics
 
-- segm_AP=0.1176, segm_AP50=0.2254, segm_AP75=0.1162
-- intact=0.2599, damaged=0.0047, destroyed=0.0881
-- train_loss=1.0842
+- segm_AP=0.1694, segm_AP50=0.3139, segm_AP75=0.1718
+- intact=0.3178, damaged=0.0541, destroyed=0.1364
+- train_loss=0.8327

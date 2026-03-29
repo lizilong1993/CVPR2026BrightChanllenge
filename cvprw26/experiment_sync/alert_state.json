@@ -4,9 +4,15 @@
   "last_frontier_experiment_id": null,
   "last_frontier_state": "inactive",
   "last_reference_experiment_id": "exp001_run1",
+  "last_reference_metric": 0.1694341960941629,
+  "last_reference_sync_event_id": "exp001_run1:best:epoch011:0.169434",
+  "monitor_failure_counts": {
+    "exp001_run1": 0
+  },
   "notified_event_ids": [
-    "critical_blocker:monitor_refresh:exp001_run1:lizilong@146.56.220.99:/remote-home/lizilong/bright_cvprw26/outputs/exp001_run1",
-    "major_progress:reference:exp001_run1:exp001_run1:best:epoch000:0.094264"
+    "major_progress:reference:exp001_run1:exp001_run1:best:epoch000:0.094264",
+    "major_progress:reference_update:exp001_run1:exp001_run1:best:epoch001:0.117580",
+    "major_progress:reference_update:exp001_run1:exp001_run1:best:epoch011:0.169434"
   ],
-  "updated_at": "2026-03-27T04:28:22Z"
+  "updated_at": "2026-03-29T00:19:54Z"
 }

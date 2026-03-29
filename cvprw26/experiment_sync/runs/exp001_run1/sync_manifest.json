@@ -1,12 +1,12 @@
 {
   "best_metric_name": "segm_AP",
-  "best_metric_value": 0.11757984572244333,
-  "epoch": 1,
+  "best_metric_value": 0.1694341960941629,
+  "epoch": 11,
   "experiment_id": "exp001_run1",
-  "exported_at": "2026-03-27T04:28:11Z",
+  "exported_at": "2026-03-29T00:19:54Z",
   "paths": [
     "metrics.jsonl",
-    "metrics_epoch001.json",
+    "metrics_epoch011.json",
     "latest_summary.md",
     "decision_log.md",
     "training_state.json",
@@ -14,5 +14,5 @@
     "repo_snapshot"
   ],
   "sync_dir": "/remote-home/lizilong/bright_cvprw26/experiment_sync/runs/exp001_run1",
-  "sync_event_id": "exp001_run1:best:epoch001:0.117580"
+  "sync_event_id": "exp001_run1:best:epoch011:0.169434"
 }
