@@ -15,6 +15,10 @@
 - `experiments.yaml`：实验索引与当前 reference 状态
 - `latest_summary.md`：本机整理后的顶层摘要视图
 - `decision_log.md`：关键 best event、状态变化和决策记录
+- `training_queue.json`：远程 watchdog 可执行的已批准训练步骤
+- `watchdog_state.json`：远程 watchdog 当前状态
+- `watchdog_events.jsonl`：远程 watchdog 关键动作日志
+- `evaluations/<exp_id>.json`：`manage_cri.py --json-out` 产出的结构化评估结果
 - `runs/<experiment_id>/`：单轮实验的结构化备份
   - `latest_summary.md`
   - `metrics.jsonl`
@@ -64,12 +68,21 @@
 
 ## 5. 推荐工作流
 
-1. 在远程主环境完成正式训练、评估或监控。
-2. 在关键节点把 `experiment_sync/runs/<experiment_id>/` 的结构化摘要回收到本机。
-3. 在本机更新 `docs/dev_management/` 和 `docs/paper_writing/`。
-4. 若内容适合 Git，则通过 GitHub 作为中转共享；若不适合 Git，则仅保留直连同步。
+1. 由远程 `scripts/remote_training_watchdog.py` 读取 `training_queue.json`，自动恢复或继续已批准训练。
+2. 训练关键节点由远程 watchdog 写入 `watchdog_state.json`、`watchdog_events.jsonl` 和 `evaluations/<exp_id>.json`。
+3. 在关键节点把 `experiment_sync/runs/<experiment_id>/` 的结构化摘要与 watchdog 状态回收到本机。
+4. 在本机更新 `docs/dev_management/` 和 `docs/paper_writing/`。
+5. 若内容适合 Git，则通过 GitHub 作为中转共享；若不适合 Git，则仅保留直连同步。
 
-## 6. 当前已确认的备份对象
+## 6. 远程 watchdog 职责边界
+
+- 只能执行 `training_queue.json` 中 `approved=true` 的训练步骤
+- 只能根据量化评估结果判断“达标 / 继续训练 / 等待本机 Codex”
+- 不能自行发明新的实验路线、骨干网络、损失函数或优化策略
+- 默认 cron 入口：
+  - `*/15 * * * * cd /remote-home/lizilong/bright_cvprw26 && /usr/bin/flock -n .watchdog.lock /usr/bin/python3 scripts/remote_training_watchdog.py >> experiment_sync/watchdog_cron.log 2>&1`
+
+## 7. 当前已确认的备份对象
 
 - `exp001_run1` 已完成同步，当前是唯一已确认的远程基线实验备份
 - `exp001_run2` 仍未形成已同步结果

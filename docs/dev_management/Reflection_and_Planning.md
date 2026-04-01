@@ -76,8 +76,8 @@
 
 ### 2.1 具体优化方案 (Specific Optimization Plan)
 - **短期计划 (Next Run)**:
-  - [ ] 在远程主环境按相同配置完成 `exp001_run2`。
-  - [ ] 在远程运行 `python manage_cri.py exp001`，建立首个 `mAP_confirm` 与 `CRI`。
+  - [ ] 由远程 watchdog 按 `training_queue.json` 自动补齐 `exp001_run2`。
+  - [ ] 由远程 watchdog 调用 `python manage_cri.py exp001 --json-out experiment_sync/evaluations/exp001.json`，建立首个 `mAP_confirm` 与 `CRI`。
   - [ ] 将 `run2` 结果和 `CRI` 同步到本机 `experiment_sync`、`Training_Log.md` 和论文日志。
 - **中期计划 (Strategic Plan)**:
   - [ ] 若 `damaged` 仍为最弱类别，优先尝试 `Focal Loss` 或 `Balanced Sampling`，一次只改一个变量。
@@ -98,3 +98,4 @@
 ## 4. 优化日志 (历史关键节点)
 - **2026-03-29**: 远程 `exp001_run1` 完成，`segm_AP=0.1694`，best epoch=11，当前低于官方公开基线。
 - **2026-04-01**: 明确“远程为主、本机为备份”的规则，并将同步策略与论文日志结构纳入项目文档。
+- **2026-04-01**: 上线远程 `remote_training_watchdog.py`、`training_queue.json` 和用户级 cron，后续 `exp001_run2` 的补跑与 CRI 评估不再依赖本机常开。

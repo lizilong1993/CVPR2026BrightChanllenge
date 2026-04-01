@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "updated_at": "2026-04-01T00:00:00Z",
+  "owner": "local_codex",
+  "notes": "Remote watchdog executes only approved training steps. It does not invent optimization routes.",
+  "final_targets": {
+    "mAP_confirm": 0.35,
+    "CRI": 100.0
+  },
+  "steps": [
+    {
+      "step_id": "exp001_confirm",
+      "experiment_family": "exp001",
+      "experiment_id": "exp001",
+      "description": "Complete exp001_run2 and compute CRI for the baseline confirmation loop.",
+      "approved": true,
+      "command": "python run_confirm.py config/disaster.yaml exp001",
+      "evaluation_command": "python manage_cri.py exp001 --json-out experiment_sync/evaluations/exp001.json",
+      "artifacts": {
+        "run1_dir": "outputs/exp001_run1",
+        "run2_dir": "outputs/exp001_run2",
+        "evaluation_path": "experiment_sync/evaluations/exp001.json"
+      },
+      "next_step_on_pass": null,
+      "next_step_on_fail": null
+    }
+  ]
+}

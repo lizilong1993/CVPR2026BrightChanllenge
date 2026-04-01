@@ -1,0 +1,2 @@
+{"timestamp":"2026-04-01T00:00:00Z","state":"bootstrap","message":"Remote watchdog event log initialized on the local backup branch.","step_id":"exp001_confirm","experiment_id":"exp001"}
+{"timestamp": "2026-04-01T04:37:33Z", "state": "running", "message": "Starting current approved step.", "step_id": "exp001_confirm", "experiment_id": "exp001", "spawned_pid": 18217, "log_path": "/remote-home/lizilong/bright_cvprw26/experiment_sync/watchdog_runs/exp001_confirm.log"}

@@ -1,0 +1,10 @@
+{
+  "state": "running",
+  "current_step_id": "exp001_confirm",
+  "active_experiment_id": "exp001",
+  "last_checked_at": "2026-04-01T04:37:33Z",
+  "last_action": "started_current_step",
+  "last_decision": "running",
+  "last_evaluation_path": "/remote-home/lizilong/bright_cvprw26/experiment_sync/evaluations/exp001.json",
+  "blocker": null
+}

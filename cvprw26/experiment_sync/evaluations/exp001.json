@@ -1,0 +1,54 @@
+{
+  "experiment_id": "exp001",
+  "generated_at": "2026-04-01T04:37:10Z",
+  "project_root": "/remote-home/lizilong/bright_cvprw26",
+  "run1_exists": true,
+  "run2_exists": false,
+  "mAP_confirm": null,
+  "class_ap_average": 0.16943419609416296,
+  "CRI": null,
+  "meets_final_target": false,
+  "final_target_thresholds": {
+    "mAP_confirm": 0.35,
+    "CRI": 100.0
+  },
+  "decision": "continue_training",
+  "reason": "run1 exists but run2 is missing; continue the approved confirmation training.",
+  "runs": {
+    "run1": {
+      "run_index": 1,
+      "run_exists": true,
+      "output_dir": "/remote-home/lizilong/bright_cvprw26/outputs/exp001_run1",
+      "sync_dir": "/remote-home/lizilong/bright_cvprw26/experiment_sync/runs/exp001_run1",
+      "metrics_source": "output_checkpoint",
+      "resume_checkpoint_exists": true,
+      "best_checkpoint_exists": true,
+      "metrics": {
+        "mAP": 0.1694341960941629,
+        "AP50": 0.31393705409732514,
+        "AP75": 0.17180406439675777,
+        "intact": 0.31784704185300466,
+        "damaged": 0.05408487994655107,
+        "destroyed": 0.13637066648293314
+      }
+    },
+    "run2": {
+      "run_index": 2,
+      "run_exists": false,
+      "output_dir": "/remote-home/lizilong/bright_cvprw26/outputs/exp001_run2",
+      "sync_dir": "/remote-home/lizilong/bright_cvprw26/experiment_sync/runs/exp001_run2",
+      "metrics_source": null,
+      "resume_checkpoint_exists": false,
+      "best_checkpoint_exists": false,
+      "metrics": null
+    }
+  },
+  "averaged_metrics": {
+    "mAP": 0.1694341960941629,
+    "AP50": 0.31393705409732514,
+    "AP75": 0.17180406439675777,
+    "intact": 0.31784704185300466,
+    "damaged": 0.05408487994655107,
+    "destroyed": 0.13637066648293314
+  }
+}

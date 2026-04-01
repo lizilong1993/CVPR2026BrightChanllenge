@@ -43,13 +43,13 @@
 ssh -p 21427 lizilong@146.56.220.99
 cd /remote-home/lizilong/bright_cvprw26
 python run_confirm.py config/disaster.yaml exp001
-python manage_cri.py exp001
+python manage_cri.py exp001 --json-out experiment_sync/evaluations/exp001.json
 ```
 
 ### 0.3 训练 Agent 当前状态
 
 - **状态**: 已定义，当前远程主线只有 `exp001_run1` 已确认完成。
-- **当前默认任务**: 在远程补齐 `exp001_run2`，再计算 `mAP_confirm` 与 `CRI`。
+- **当前默认任务**: 由远程 watchdog 补齐 `exp001_run2`，再生成 `mAP_confirm` 与 `CRI` 的结构化评估结果。
 - **移交条件**: `run1`、`run2` 均形成已同步摘要，本文件与 `Reflection_and_Planning.md` 已完成闭环回写。
 
 ## 1. 训练结果总览表
@@ -58,6 +58,7 @@ python manage_cri.py exp001
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | 000 | 2026-03-25 | 官方公开基线 (Mask R-CNN) | 0.1854 | 0.3540 | - | 官方公开结果 | published | 用作最低可接受阈值 |
 | exp001_run1 | 2026-03-29 | 远程基线首次完整运行 | 0.1694 | 0.3139 | 0.1718 | 远程服务器；GPU 型号与训练时长待回收 | completed | 单次结果，低于官方基线，尚未形成 `mAP_confirm`/`CRI` |
+| exp001_run2 | 2026-04-01 | 远程 watchdog 触发的同配置复现 | - | - | - | 远程服务器；由用户级 cron + watchdog 维持 | running | `2026-04-01T04:37:33Z` 启动，用于补齐 `mAP_confirm`/`CRI` |
 
 ## 2. 已确认远程实验记录
 
@@ -101,11 +102,29 @@ python manage_cri.py exp001
   - 当前结果低于官方公开基线 `0.1854`，不能作为主线最佳方案。
   - 当前仅有 `run1`，不得宣称形成双复现确认。
 - **下一步**:
-  - 在远程执行同配置 `exp001_run2`
-  - 远程运行 `python manage_cri.py exp001`
+  - 由远程 watchdog 按同配置补齐 `exp001_run2`
+  - 由远程 watchdog 运行 `python manage_cri.py exp001 --json-out experiment_sync/evaluations/exp001.json`
   - 将 `run2` 结果和 `CRI` 回写本文件与论文日志
 
-## 3. 记录规则
+## 3. 进行中远程实验
+
+### 实验编号: exp001_run2
+
+- **来源环境**: `lizilong@146.56.220.99:21427:/remote-home/lizilong/bright_cvprw26`
+- **启动时间**: `2026-04-01T04:37:33Z`
+- **触发方式**: 远程 `scripts/remote_training_watchdog.py` 手动首跑，后续由用户级 cron 接管
+- **执行命令**: `/usr/bin/python3 run_confirm.py config/disaster.yaml exp001`
+- **当前状态**: `running`
+- **已确认产物**:
+  - `outputs/exp001_run2/config_seed123.yaml` 已生成
+  - `outputs/exp001_run2/train.log` 已生成
+  - `experiment_sync/watchdog_state.json` 已更新为 `running`
+- **当前目标**:
+  - 完成 `run2`
+  - 生成 `experiment_sync/evaluations/exp001.json`
+  - 回收 `run2` 摘要并建立首个 `mAP_confirm` 与 `CRI`
+
+## 4. 记录规则
 
 - 只记录已验证并已同步回本机的远程关键结果。
 - 若本机与远程冲突，以远程已验证事实为准。

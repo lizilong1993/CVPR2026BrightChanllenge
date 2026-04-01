@@ -97,7 +97,7 @@
 1. **训练前先看计划**: 启动新一轮训练前，必须先查看 `Reflection_and_Planning.md`，并严格按其中当前计划执行。
 2. **训练前先补计划**: 每次训练前，必须先在 `Reflection_and_Planning.md` 记录本轮变动原因、预期收益、风险与验证标准。
 3. **训练后先验证**: 每次训练后，必须先在远程主环境对 `data/instance_annotations/val.json` 运行验证，得到 `mAP`、各类 AP 及其他必要指标。
-4. **关键节点再同步**: 只有在产生 best/reference、实验结束、进入阻断态或形成稳定结论时，才把 `experiment_sync/runs/<experiment_id>` 摘要回收到本机备份层。
+4. **关键节点再同步**: 只有在产生 best/reference、实验结束、进入阻断态或形成稳定结论时，才把 `experiment_sync/runs/<experiment_id>` 摘要、`evaluations/<exp_id>.json` 与 `watchdog_state.json` 回收到本机备份层。
 5. **训练后立即记日志**: 验证和同步完成后，立即更新 `Training_Log.md`，至少记录 `mAP`、各类 AP、配置变化、同步时间、结论和下一步。
 6. **训练后同步反思**: 同一轮实验结束后，必须回写 `Reflection_and_Planning.md`，补全结果分析、问题定位、是否达预期、下一轮计划，形成闭环。
 6. **退化必须处理**: 若当前 `mAP` 低于上一次结果，必须执行既定扣分规则，并明确给出下一步修复方案，不得跳过。

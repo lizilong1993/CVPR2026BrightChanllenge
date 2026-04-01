@@ -105,3 +105,24 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 2026-03-29T00:19:54Z | `exp001_run1` best + completed | `/remote-home/lizilong/bright_cvprw26/experiment_sync/runs/exp001_run1` | 远程摘要回收到本机备份层 | `latest_summary.md`, `metrics.jsonl`, `metrics_epoch011.json`, `training_state.json`, `origin_info.json`, `decision_log.md` | 当前首个稳定远程基线快照 |
 | 2026-04-01 | 规则与论文日志收敛 | 本机备份层 | 文档更新，待通过 GitHub 共享 | `agent.md`, `PROJECT_CONTEXT.md`, `docs/dev_management/`, 本文件 | 不引入新的训练结果，只整理已确认事实 |
+| 2026-04-01 | 远程 watchdog 与本机 Frontier Loop 升级 | `/remote-home/lizilong/bright_cvprw26` | 本机分支实现并部署到远程 | `manage_cri.py`, `scripts/remote_training_watchdog.py`, `training_queue.json`, `watchdog_state.json`, 本机自动化配置 | 目标是让 `exp001_run2` 的续训和后续量化门禁不再依赖本机关机状态 |
+| 2026-04-01T04:37:33Z | 远程 watchdog 启动 `exp001_run2` | `/remote-home/lizilong/bright_cvprw26/outputs/exp001_run2` | 远程 watchdog 状态与运行目录回收到本机备份层 | `watchdog_state.json`, `watchdog_events.jsonl`, `outputs/exp001_run2/config_seed123.yaml`, `outputs/exp001_run2/train.log` | 证明远程自驱续训链路已实际拉起训练，而不是只停留在文档或脚本层 |
+
+## 6. 系统级里程碑
+
+### 6.1 远程自驱续训机制上线
+
+- 时间：`2026-04-01`
+- 远程环境：`lizilong@146.56.220.99:21427:/remote-home/lizilong/bright_cvprw26`
+- 变更内容：
+  - 新增远程 `scripts/remote_training_watchdog.py`
+  - 新增 `experiment_sync/training_queue.json`
+  - 新增 `experiment_sync/watchdog_state.json` 与 `watchdog_events.jsonl`
+  - 扩展 `manage_cri.py`，使其可以输出 `evaluations/<exp_id>.json`
+  - 将本机 `BRIGHT Frontier Loop` 改为读取远程 watchdog 状态，而不是本地直接判断是否开训
+- 设计约束：
+  - 远程 watchdog 只执行已批准训练步骤
+  - 不达标但没有下一步批准计划时，状态必须停在 `awaiting_local_codex`
+  - 本机自动化只在 `awaiting_local_codex`、`stalled`、`critical_blocker` 时保留 inbox 和进入调研
+- 可直接用于论文方法部分的表述：
+  - 为减少本机关机对实验连续性的影响，项目引入了一个运行在远程服务器上的轻量 watchdog。该模块通过读取显式训练队列与结构化评估结果，在训练中断时自动恢复已批准实验，并在达到量化门禁或进入阻塞状态时将状态回传到本机备份层。

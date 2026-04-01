@@ -1,6 +1,7 @@
 import subprocess
 import yaml
 import os
+import sys
 
 def run_train(config_path, output_dir, seed):
     # Load config
@@ -24,7 +25,7 @@ def run_train(config_path, output_dir, seed):
         yaml.dump(cfg, f)
     
     print(f"Starting training with seed {seed}, output to {output_dir}")
-    cmd = ["python", "-m", "src.train", "--config", temp_config]
+    cmd = [sys.executable, "-m", "src.train", "--config", temp_config]
     if os.path.exists(latest_ckpt):
         print(f"Resuming existing run for seed {seed}: {latest_ckpt}")
         cmd.extend(["--resume", latest_ckpt])
@@ -52,7 +53,7 @@ def main():
     
     # Calculate CRI
     print(f"All runs for {exp_id} completed. Calculating CRI...")
-    subprocess.run(["python", "manage_cri.py", exp_id])
+    subprocess.run([sys.executable, "manage_cri.py", exp_id])
 
 if __name__ == "__main__":
     main()
